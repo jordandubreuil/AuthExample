@@ -7,13 +7,14 @@ var flash = require('connect-flash');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var db = require('./helper/database');
+var passport = require('passport')
 
 //load routes
 var games = require('./routes/games');
 var users = require('./routes/users');
 
 //load passport
-
+require('./config/passport')(passport)
 
 
 //connect to mongoose
@@ -32,7 +33,7 @@ mongoose.connect(db.mongoURI ,{
 app.use(methodOverride('_method'));
 
 //this code sets up template engine as express handlebars
-app.engine('handlebars', exphbs({defaultLayout:'main'}));
+app.engine('handlebars', exphbs.engine({defaultLayout:'main'}));
 app.set('view engine', 'handlebars');
 
 // create application/json parser
@@ -48,7 +49,8 @@ app.use(session({
 }));
 
 //initializes passport
-
+app.use(passport.initialize())
+app.use(passport.session())
 
 //Setup for flash messaging
 app.use(flash());

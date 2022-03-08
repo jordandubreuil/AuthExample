@@ -1,8 +1,8 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs');
-var passport = require('passport');
 var router = express.Router();
+var passport = require('passport')
 
 //load game model
 require('../models/User');

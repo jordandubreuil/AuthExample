@@ -1,6 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var router = express.Router();
+var {ensureAuthenticated} = require("../helper/auth")
 
 
 //load game model
@@ -9,8 +10,8 @@ var Game = mongoose.model('games');
 
 //Game Entry CRUD route
 
-router.get('/games', function(req, res){
-    Game.find({user:req.user.id}).then(function(games){
+router.get('/games', ensureAuthenticated, function(req, res){
+    Game.find({user:req.user.id}).lean().then(function(games){
         console.log("Fetch Route ");
         console.log(games);
         res.render('gameentry/index',{
@@ -20,14 +21,15 @@ router.get('/games', function(req, res){
     
 });
 
-router.get('/gameentry/gameentryadd', function(req, res){
+router.get('/gameentry/gameentryadd',ensureAuthenticated, function(req, res){
     res.render('gameentry/gameentryadd');
 });
 
-router.get('/gameentry/gameentryedit/:id',  function(req, res){
+router.get('/gameentry/gameentryedit/:id',ensureAuthenticated,  function(req, res){
+    console.log(req.params.id)
     Game.findOne({
         _id:req.params.id
-    }).then(function(game){
+    }).lean().then(function(game){
 
         if(game.user != req.user.id){
             req.flash('error_msg', 'Not Authorized');
@@ -43,7 +45,7 @@ router.get('/gameentry/gameentryedit/:id',  function(req, res){
 });
 
 //Post Requests
-router.post('/gameentry', function(req,res){
+router.post('/gameentry',ensureAuthenticated, function(req,res){
     console.log(req.body);
     var errors = [];
 
@@ -85,7 +87,8 @@ router.post('/gameentry', function(req,res){
     //res.send(req.body);
 });
 
-router.put('/gameedit/:id', function(req,res){
+router.put('/gameedit/:id',ensureAuthenticated, function(req,res){
+    console.log(req.params.id)
     Game.findOne({
         _id:req.params.id
     }).then(function(game){
@@ -101,7 +104,7 @@ router.put('/gameedit/:id', function(req,res){
     });
 });
 
-router.delete('/gamedelete/:id', function(req,res){
+router.delete('/gamedelete/:id',ensureAuthenticated, function(req,res){
     Game.deleteOne({
         _id:req.params.id
     }).then(function(){
